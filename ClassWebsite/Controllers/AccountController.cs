@@ -12,6 +12,10 @@ namespace ClassWebsite.Controllers
         [HttpGet]
         public ActionResult Register()
         {
+            if (SessionHelper.IsUserLoggedIn())
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
@@ -29,10 +33,54 @@ namespace ClassWebsite.Controllers
                     Email = mem.Email,
                 };
                 MemberDB.RegisterMember(m);
+                SessionHelper.LogUserIn(m);
                 return RedirectToAction("Index", "Home");
             }
             // if invalid, return view w/ errors
             return View(mem);
+        }
+
+        [HttpGet]
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Login(LoginViewModel loginData)
+        {
+            if (ModelState.IsValid)
+            {
+                Member m = MemberDB.FindMember(loginData.Username, loginData.Password);
+                if(m == null)
+                {
+                    ModelState.AddModelError("InvalidCredentials", "No Account with those credentials was found");
+                    return View(loginData);
+                }
+
+                //log them in
+                SessionHelper.LogUserIn(m);
+                //redirect to index page
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View(loginData);
+        }
+
+        public ActionResult LogOut()
+        {
+            Session.Abandon(); //ends user's session
+            return RedirectToAction("Index", "Home");
+        }
+
+        public ActionResult MyAccount()
+        {
+            if (SessionHelper.IsUserLoggedIn())
+            {
+                Member currMember = MemberDB.GetCurrentMember();
+                return View(currMember);
+            }
+            return RedirectToAction("Login", "Account");
         }
     }
 }
