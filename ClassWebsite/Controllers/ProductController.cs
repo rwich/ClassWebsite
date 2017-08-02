@@ -1,6 +1,7 @@
 ﻿using ClassWebsite.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -10,9 +11,17 @@ namespace ClassWebsite.Controllers
     public class ProductController : Controller
     {
         [HttpGet]
-        public ActionResult Index()
+        public ActionResult Index(int? id)
         {
-            List<Product> prods = ProductDB.GetAllProducts();
+            int currentPage = (id.HasValue) ? id.Value : 1; // shorter version of if/else - turnary operator, ?:
+            const int ProdsPerPage = 2;
+
+            ECommerceDB db = new ECommerceDB();
+            List<Product> prods = db.Products.OrderBy(p => p.Name).Skip((currentPage - 1) * ProdsPerPage).Take(ProdsPerPage).ToList();
+
+            //cast to avoid integer division, & round up to nearest whole number
+            ViewBag.MaxPage = Math.Ceiling(db.Products.Count() / (double)ProdsPerPage);
+            ViewBag.CurrentPage = currentPage;
             return View(prods);
         }
 
@@ -23,10 +32,28 @@ namespace ClassWebsite.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(Product p)
+        public ActionResult Create(Product p, HttpPostedFileBase prodPhoto)
         {
             if (ModelState.IsValid)
             {
+                if(prodPhoto != null && prodPhoto.ContentLength > 0)
+                {
+                    //check MIME type
+
+                    //create filename
+                    //string fileName = Path.GetFileName(prodPhoto.FileName);
+
+                    //generate a unique filename to prevent being overwritten
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(prodPhoto.FileName);
+
+                    //generate path w/ filename
+                    string path = Path.Combine(Server.MapPath("~/Images"), fileName);
+
+                    //save file
+                    prodPhoto.SaveAs(path);
+                    p.PhotoLocation = fileName;
+                }
+
                 ProductDB.AddProduct(p);
                 return RedirectToAction("Index", "Product"); //redirect to index of product controller
             }

@@ -18,5 +18,7 @@ namespace ClassWebsite.Models
         public double RetailPrice { get; set; }
         [Range(0, 1000000000)]
         public double WholeSalePrice { get; set; }
+
+        public string PhotoLocation { get; set; }
     }
 }
