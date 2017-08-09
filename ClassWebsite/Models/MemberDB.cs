@@ -47,5 +47,17 @@ namespace ClassWebsite.Models
                           select m).Single();
             return mem;
         }
+
+        public static bool DoesUsernameExist(string username)
+        {
+            ECommerceDB db = new ECommerceDB();
+
+            int count =
+            (from u in db.Members
+            where u.Username == username
+            select u).Count();
+
+            return (count == 1) ? true : false;
+        }
     }
 }

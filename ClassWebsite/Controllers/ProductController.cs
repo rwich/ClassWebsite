@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
@@ -68,7 +69,8 @@ namespace ClassWebsite.Controllers
             //if no product id is supplied in the url, user is redirected
             if(id == null)
             {
-                return RedirectToAction("Index", "Product");
+                //return RedirectToAction("Index", "Product");
+                return new HttpStatusCodeResult(HttpStatusCode.NotFound);
             }
 
             Product p = ProductDB.GetProductById(id.Value);

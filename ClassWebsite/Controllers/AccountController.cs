@@ -25,6 +25,13 @@ namespace ClassWebsite.Controllers
             // make sure model is valid
             if (ModelState.IsValid)
             {
+                if (MemberDB.DoesUsernameExist(mem.Username))
+                {
+                    ModelState.AddModelError("DuplicateUsername", "Username is already taken");
+
+                    return View(mem);
+                }
+
                 // if valid add to DB
                 Member m = new Member()
                 {

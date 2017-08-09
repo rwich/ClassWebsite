@@ -20,23 +20,7 @@
                 <li role="presentation" class="active">
                     <a href="/Home/Index">Home</a>
                 </li>
-                @if (Session["MemberID"] == null)
-                {
-                    <li role="presentation">
-                        <a href="/Home/About">About</a>
-                    </li>
-                    <li role="presentation">
-                        @Html.ActionLink("Register", "Register", "Account")
-                    </li>
-                    <li role="presentation">
-                        @Html.ActionLink("Sign-in", "Login", "Account")
-                    </li>
-                }
-                else
-                {
-                    <li>@Html.ActionLink("Log Out", "LogOut", "Account")</li>
-                    <li>@Html.ActionLink("View Profile", "MyAccount", "Account")</li>
-                }
+               @Html.Partial("_MemberNav")
                 <li role="presentation">
                     @Html.ActionLink("View Products", "Index", "Product")
                 </li>
